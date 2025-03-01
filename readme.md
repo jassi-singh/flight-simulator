@@ -9,18 +9,16 @@
 - [x] Include Three.js in `index.html` (via `node_modules` or a bundler).
 
 ### Basic 3D Scene
-- [ ] Initialize a Three.js scene, camera, and renderer in `app.js`.
-- [ ] Set the renderer size to fill the browser window.
-- [ ] Add a simple object (e.g., `THREE.BoxGeometry` or `THREE.SphereGeometry`).
-- [ ] Implement a basic animation loop.
-- [ ] Verify that the object is rotating or moving.
+- [x] Initialize a Three.js scene, camera, and renderer in `app.js`.
+- [x] Set the renderer size to fill the browser window.
+- [x] Add a simple object (e.g., `THREE.BoxGeometry` or `THREE.SphereGeometry`).
+- [x] Implement a basic animation loop.
+- [x] Verify that the object is rotating or moving.
 
 ### Basic Aircraft Model
-- [ ] Find a simple 3D aircraft model (preferably in glTF format).
-- [ ] Install GLTFLoader (`pnpm add three`).
-- [ ] Import and use `GLTFLoader` to load the model.
-- [ ] Add the aircraft model to the scene.
-- [ ] Position and scale the aircraft appropriately.
+- [x] Create Aircraft model with three.js.
+- [x] Load the aircraft model into the scene.
+- [x] Position and scale the aircraft appropriately.
 
 ### Camera Control (Basic)
 - [ ] Attach the camera to the aircraft.
