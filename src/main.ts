@@ -1,5 +1,5 @@
 import aircraft from './aircraft';
-import { handleAircraftControls } from './controls';
+import { handleAircraftControls, updateHud } from './controls';
 import { ground, sky } from './ground-sky';
 import './style.css';
 import * as THREE from 'three';
@@ -40,6 +40,7 @@ function animate() {
 
   updateCamera();
   handleAircraftControls(aircraft);
+  updateHud();
 
   renderer.render(scene, camera);
 

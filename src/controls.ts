@@ -42,4 +42,13 @@ export function handleAircraftControls(aircraft: Aircraft) {
   //aircraft.rotation.y = aircraftState.yaw;
 }
 
+export function updateHud() {
+  document.getElementById("speed")!.innerText = aircraftState.speed.toFixed(2);
+  document.getElementById("altitude")!.innerText = aircraftState.altitude.toFixed(2);
+  document.getElementById("throttle")!.innerText = aircraftState.throttle.toFixed(2);
+  document.getElementById("pitch")!.innerText = aircraftState.pitch.toFixed(2);
+  document.getElementById("roll")!.innerText = aircraftState.roll.toFixed(2);
+  document.getElementById("yaw")!.innerText = aircraftState.yaw.toFixed(2);
+}
+
 

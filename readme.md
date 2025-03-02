@@ -37,8 +37,8 @@
 - [x] Position the aircraft above the ground.
 
 ### Basic UI (HUD)
-- [ ] Add an HTML element to display aircraft speed and altitude.
-- [ ] Update these values in the animation loop.
+- [x] Add an HTML element to display aircraft speed and altitude.
+- [x] Update these values in the animation loop.
 
 ---
 

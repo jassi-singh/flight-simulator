@@ -21,6 +21,17 @@ body {
   min-height: 100vh;
 }
 
+#hud {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fafafa;
+  width: 200px;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     color: #213547;
