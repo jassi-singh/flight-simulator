@@ -1,30 +1,29 @@
 import aircraft from './aircraft';
+import { camera, updateCamera } from './camera';
+import { handleCameraControls } from './controls';
 import './style.css';
-import * as Three from 'three';
+import * as THREE from 'three';
 
-const scene = new Three.Scene();
-const camera = new Three.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const scene = new THREE.Scene();
 
-const renderer = new Three.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setAnimationLoop(animate);
 document.body.appendChild(renderer.domElement);
 
-const ambientLight = new Three.AmbientLight(0xffffff, 0.5); // Soft light
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft light
 scene.add(ambientLight);
 
-const directionalLight = new Three.DirectionalLight(0xffffff, 1);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 directionalLight.position.set(5, 5, 5); // Position the light
 scene.add(directionalLight);
 
 scene.add(aircraft)
 
-camera.position.z = 5;
-
 function animate() {
-
-  aircraft.rotation.y += 0.01;
-  aircraft.propeller.rotation.x += 0.1;
+  aircraft.propeller.rotation.z += 0.1;
+  updateCamera()
+  handleCameraControls(camera, aircraft);
 
   renderer.render(scene, camera);
 

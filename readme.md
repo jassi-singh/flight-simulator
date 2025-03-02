@@ -21,9 +21,9 @@
 - [x] Position and scale the aircraft appropriately.
 
 ### Camera Control (Basic)
-- [ ] Attach the camera to the aircraft.
-- [ ] Implement basic camera movement using WASD keys.
-- [ ] Implement basic pitch and roll control (rotate the camera).
+- [x] Attach the camera to the aircraft.
+- [x] Implement basic camera movement using WASD keys.
+- [x] Implement basic pitch and roll control (rotate the camera).
 
 ### Basic Flight Dynamics (Simplified)
 - [ ] Introduce variables for aircraft speed, altitude, and orientation.
