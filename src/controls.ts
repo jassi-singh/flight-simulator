@@ -1,5 +1,4 @@
 import { Aircraft } from "./interface";
-import * as THREE from "three";
 
 const keyState: Record<string, boolean> = {};
 
@@ -18,36 +17,29 @@ const aircraftState = {
 
 const maxSpeed = 2;
 const rotationSpeed = 0.02;
-const liftForce = 0.02; // Lift effect
+//const liftForce = 0.02; // Lift effect
+
+
 
 export function handleAircraftControls(aircraft: Aircraft) {
   // Throttle control (increase/decrease speed)
   if (keyState["ShiftLeft"]) aircraftState.throttle = Math.min(1, aircraftState.throttle + 0.01);
   if (keyState["ControlLeft"]) aircraftState.throttle = Math.max(0, aircraftState.throttle - 0.01);
 
-  // Adjust speed based on throttle
+  if (keyState["ArrowUp"]) aircraftState.pitch = Math.max(-1, aircraftState.pitch - rotationSpeed); // Nose up
+  if (keyState["ArrowDown"]) aircraftState.pitch = Math.min(1, aircraftState.pitch + rotationSpeed); // Nose down
+
+  if (keyState["ArrowLeft"]) aircraftState.roll = Math.min(1, aircraftState.roll + rotationSpeed); // Roll left
+  if (keyState["ArrowRight"]) aircraftState.roll = Math.max(-1, aircraftState.roll - rotationSpeed); // Roll right
+
+  aircraftState.yaw += aircraftState.roll * rotationSpeed * 0.5;
+
   aircraftState.speed = maxSpeed * aircraftState.throttle;
 
-  // Rotation Updates
-  const pitchDelta = (keyState["ArrowUp"] ? -rotationSpeed : 0) + (keyState["ArrowDown"] ? rotationSpeed : 0);
-  const rollDelta = (keyState["ArrowLeft"] ? rotationSpeed : 0) + (keyState["ArrowRight"] ? -rotationSpeed : 0);
-  const yawDelta = (keyState["KeyA"] ? rotationSpeed : 0) + (keyState["KeyD"] ? -rotationSpeed : 0);
-
-  aircraftState.pitch += pitchDelta;
-  aircraftState.roll += rollDelta;
-  aircraftState.yaw += yawDelta;
-
-  // Apply rotation smoothly using quaternions
-  const euler = new THREE.Euler(aircraftState.pitch, aircraftState.yaw, aircraftState.roll, "YXZ");
-  aircraft.quaternion.setFromEuler(euler);
-
-  // Move forward in the aircraft's direction
-  const direction = new THREE.Vector3(0, 0, -1); // Default forward direction
-  direction.applyQuaternion(aircraft.quaternion);
-  aircraft.position.addScaledVector(direction, aircraftState.speed);
-
-  // Smooth altitude update (simulate lift)
-  aircraftState.altitude += pitchDelta * liftForce;
-  aircraft.position.y = THREE.MathUtils.lerp(aircraft.position.y, aircraftState.altitude, 0.1);
+  // Apply rotations
+  aircraft.rotation.x = aircraftState.pitch;
+  aircraft.rotation.z = aircraftState.roll;
+  //aircraft.rotation.y = aircraftState.yaw;
 }
+
 

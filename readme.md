@@ -32,9 +32,9 @@
 - [x] Update the aircraft's position and orientation.
 
 ### Basic Terrain (Simple Plane)
-- [ ] Create a large `THREE.PlaneGeometry` to represent the ground.
-- [ ] Apply a simple texture (e.g., grass texture).
-- [ ] Position the aircraft above the ground.
+- [x] Create a large `THREE.PlaneGeometry` to represent the ground.
+- [x] Apply a simple texture (e.g., grass texture).
+- [x] Position the aircraft above the ground.
 
 ### Basic UI (HUD)
 - [ ] Add an HTML element to display aircraft speed and altitude.
