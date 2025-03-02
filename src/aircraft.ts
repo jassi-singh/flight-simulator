@@ -1,16 +1,12 @@
-
 import * as THREE from 'three';
-
-export interface Aircraft extends THREE.Group {
-  propeller: THREE.Group;
-}
+import { Aircraft } from './interface';
 
 // Function to create fuselage
 function createFuselage() {
-  const geometry = new THREE.CylinderGeometry(0.3, 0.5, 3, 32);
+  const geometry = new THREE.CylinderGeometry(0.5, 0.3, 3, 32);
   const material = new THREE.MeshStandardMaterial({ color: 0x5555ff });
   const fuselage = new THREE.Mesh(geometry, material);
-  fuselage.rotation.x = Math.PI / 2; // Align with Z-axis
+  fuselage.rotation.x = -Math.PI / 2; // Align with Z-axis
   return fuselage;
 }
 
@@ -25,7 +21,7 @@ function createCockpit(material: THREE.Material) {
 // Function to create wings
 function createWing() {
   const geometry = new THREE.BoxGeometry(3, 0.1, 1); // Wingspan along X-axis
-  const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+  const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
   const wing = new THREE.Mesh(geometry, material);
   wing.position.set(0, 0, 0);
   return wing;
@@ -84,8 +80,6 @@ aircraft.add(createWing());
 aircraft.add(createTail());
 const propeller = createPropeller();
 aircraft.add(propeller);
-
-aircraft.rotateY(Math.PI); // Rotate 180 degrees to face forward
 
 aircraft.propeller = propeller;
 

@@ -26,10 +26,10 @@
 - [x] Implement basic pitch and roll control (rotate the camera).
 
 ### Basic Flight Dynamics (Simplified)
-- [ ] Introduce variables for aircraft speed, altitude, and orientation.
-- [ ] Implement throttle control (increase/decrease speed).
-- [ ] Implement pitch, roll, and yaw control using keyboard input.
-- [ ] Update the aircraft's position and orientation.
+- [x] Introduce variables for aircraft speed, altitude, and orientation.
+- [x] Implement throttle control (increase/decrease speed).
+- [x] Implement pitch, roll, and yaw control using keyboard input.
+- [x] Update the aircraft's position and orientation.
 
 ### Basic Terrain (Simple Plane)
 - [ ] Create a large `THREE.PlaneGeometry` to represent the ground.
