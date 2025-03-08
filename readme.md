@@ -45,9 +45,9 @@
 ## Phase 2: Improving Realism and Control
 
 ### Refined Flight Dynamics
-- [ ] Introduce lift, drag, and gravity forces.
-- [ ] Implement a more realistic flight model.
-- [ ] Implement stall behavior.
+- [x] Introduce lift, drag, and gravity forces.
+- [x] Implement a more realistic flight model.
+- [x] Implement stall behavior.
 - [ ] Add a basic autopilot (optional).
 
 ### Improved Camera Control

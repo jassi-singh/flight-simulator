@@ -22,14 +22,12 @@ scene.add(ground);
 scene.background = sky;
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0, 2, 5); // Position it behind and slightly above the aircraft
-aircraft.position.set(0, 5, 0); // Center the aircraft
 camera.lookAt(aircraft.position)
 
 scene.add(aircraft)
 
 function updateCamera() {
-  const offset = new THREE.Vector3(0, 2, 5); // Position behind and above
+  const offset = new THREE.Vector3(0, 2, -5); // Position behind and above
   offset.applyQuaternion(aircraft.quaternion); // Rotate with aircraft
   camera.position.copy(aircraft.position).add(offset);
   camera.lookAt(aircraft.position);

@@ -6,7 +6,7 @@ function createFuselage() {
   const geometry = new THREE.CylinderGeometry(0.5, 0.3, 3, 32);
   const material = new THREE.MeshStandardMaterial({ color: 0x5555ff });
   const fuselage = new THREE.Mesh(geometry, material);
-  fuselage.rotation.x = -Math.PI / 2; // Align with Z-axis
+  fuselage.rotation.x = Math.PI / 2; // Align with Z-axis
   return fuselage;
 }
 
@@ -14,7 +14,7 @@ function createFuselage() {
 function createCockpit(material: THREE.Material) {
   const geometry = new THREE.SphereGeometry(0.3, 16, 16);
   const cockpit = new THREE.Mesh(geometry, material);
-  cockpit.position.set(0, 0, -1.6);
+  cockpit.position.set(0, 0, 1.6);
   return cockpit;
 }
 
@@ -34,12 +34,12 @@ function createTail() {
 
   // Vertical Stabilizer
   const verticalStabilizer = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 0.5), material);
-  verticalStabilizer.position.set(0, 0.5, 1.4);
+  verticalStabilizer.position.set(0, 0.5, -1.4);
   tailGroup.add(verticalStabilizer);
 
   // Horizontal Stabilizer
   const horizontalStabilizer = new THREE.Mesh(new THREE.BoxGeometry(1, 0.1, 0.6), material);
-  horizontalStabilizer.position.set(0, 0.3, 1.4);
+  horizontalStabilizer.position.set(0, 0.3, -1.4);
   tailGroup.add(horizontalStabilizer);
 
   return tailGroup;
@@ -64,7 +64,7 @@ function createPropeller() {
   blade.rotation.x = Math.PI / 2;
   propeller.add(blade);
 
-  propeller.position.set(0, 0, -2); // Move to nose
+  propeller.position.set(0, 0, 2); // Move to nose
 
   return propeller;
 }
