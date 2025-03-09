@@ -34,7 +34,7 @@ function updateCamera() {
 }
 
 function animate() {
-  aircraft.propeller.rotation.z += 0.1;
+  aircraft.propeller.rotation.z += 0.3;
 
   updateCamera();
   handleAircraftControls(aircraft);

@@ -1,22 +1,25 @@
 import * as THREE from "three";
 
-const groundSize = 20; // 20x20 block terrain
-const blockSize = 1;
-const ground = new THREE.Group(); // Group to hold all blocks
+const groundSize = 1000; // Terrain dimensions
 const textureLoader = new THREE.TextureLoader();
+
+// Load grass texture with proper wrapping
 const grassTexture = textureLoader.load("/textures/grass.jpg");
+grassTexture.wrapS = THREE.RepeatWrapping;
+grassTexture.wrapT = THREE.RepeatWrapping;
+grassTexture.repeat.set(groundSize / 10, groundSize / 10); // Adjust tiling
 
-const blockMaterial = new THREE.MeshStandardMaterial({ map: grassTexture });
+const geometry = new THREE.PlaneGeometry(groundSize, groundSize, 256, 256);
+const material = new THREE.MeshStandardMaterial({
+  map: grassTexture, // Apply the grass texture
+  displacementScale: 10, // Adjust elevation height
+  wireframe: false
+});
 
-for (let x = 0; x < groundSize; x++) {
-  for (let z = 0; z < groundSize; z++) {
-    const blockGeometry = new THREE.BoxGeometry(blockSize, blockSize, blockSize);
-    const block = new THREE.Mesh(blockGeometry, blockMaterial);
-
-    block.position.set(x - groundSize / 2, -blockSize / 2, z - groundSize / 2); // Center it
-    ground.add(block);
-  }
-}
+const ground = new THREE.Mesh(geometry, material);
+ground.rotation.x = -Math.PI / 2; // Rotate to be flat
+ground.position.y = -1; // Lower the ground
+ground.receiveShadow = true;
 
 const skyboxLoader = new THREE.CubeTextureLoader();
 const sky = skyboxLoader.load([
