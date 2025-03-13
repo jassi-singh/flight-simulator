@@ -3,6 +3,40 @@ import * as THREE from "three";
 
 // Tracks the state of key presses
 const keyState: Record<string, boolean> = {};
+const bullets: { mesh: THREE.Mesh, lifespan: number }[] = []; // Store active bullets
+const bulletSpeed = 5;
+const bulletLifetime = 100; // Frames before bullet disappears
+
+/** Shoot bullets */
+function shootBullet(aircraft: Aircraft, scene: THREE.Scene) {
+  const bulletGeometry = new THREE.SphereGeometry(0.3, 8, 8); // Small sphere bullet
+  const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  const bullet = new THREE.Mesh(bulletGeometry, bulletMaterial);
+
+  bullet.position.copy(aircraft.position); // Start at aircraft position
+
+  // Set initial velocity
+  const direction = new THREE.Vector3();
+  aircraft.getWorldDirection(direction);
+  bullet.userData.velocity = direction.multiplyScalar(bulletSpeed);
+
+  bullets.push({ mesh: bullet, lifespan: bulletLifetime });
+  scene.add(bullet);
+}
+
+/** Update bullets movement */
+export function updateBullets(scene: THREE.Scene) {
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    const bullet = bullets[i];
+    bullet.mesh.position.add(bullet.mesh.userData.velocity);
+
+    bullet.lifespan--; // Reduce lifespan
+    if (bullet.lifespan <= 0) {
+      scene.remove(bullet.mesh);
+      bullets.splice(i, 1);
+    }
+  }
+}
 
 // Listen for key presses
 window.addEventListener("keydown", (event) => (keyState[event.code] = true));
@@ -55,7 +89,7 @@ class AircraftState {
 const aircraftState = new AircraftState();
 
 /** Handle user input */
-function handleInput() {
+function handleInput(aircraft: Aircraft, scene: THREE.Scene) {
   // Throttle control (W/S)
   if (keyState["KeyW"]) aircraftState.throttle = Math.min(1, aircraftState.throttle + 0.01);
   if (keyState["KeyS"]) aircraftState.throttle = Math.max(0, aircraftState.throttle - 0.01);
@@ -84,6 +118,13 @@ function handleInput() {
     aircraftState.roll *= 0.95; // Slowly return to zero
   }
 
+  // Shoot bullets (Space)
+  if (keyState["Space"]) {
+    shootBullet(aircraft, scene);
+    // add recoil to the aircraft by nosing down
+    aircraftState.pitch += aircraftState.rotationSpeed * 0.2;
+  }
+
   // Yaw Control (A/D) - Turn left/right
   if (aircraftState.isOnGround) {
     if (keyState["ArrowLeft"] || keyState["KeyA"]) aircraftState.yaw += aircraftState.rotationSpeed; // Direct turn on ground
@@ -92,8 +133,8 @@ function handleInput() {
 }
 
 /** Update aircraft movement */
-export function handleAircraftControls(aircraft: Aircraft) {
-  handleInput(); // Read input
+export function handleAircraftControls(aircraft: Aircraft, scene: THREE.Scene) {
+  handleInput(aircraft, scene); // Read input
   aircraftState.updateSpeed();
   aircraftState.applyPhysics();
 
@@ -115,9 +156,6 @@ export function handleAircraftControls(aircraft: Aircraft) {
   aircraftState.isOnGround = aircraftState.altitude <= 0;
 }
 
-
-
-
 export function updateHud() {
   document.getElementById("speed")!.innerText = aircraftState.speed.toFixed(2);
   document.getElementById("altitude")!.innerText = aircraftState.altitude.toFixed(2);
@@ -126,5 +164,4 @@ export function updateHud() {
   document.getElementById("roll")!.innerText = aircraftState.roll.toFixed(2);
   document.getElementById("yaw")!.innerText = aircraftState.yaw.toFixed(2);
 }
-
 

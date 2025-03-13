@@ -49,29 +49,29 @@ function createTail() {
 }
 
 // Function to create propeller
-function createPropeller() {
-  const propeller = new THREE.Group();
-
-  // Hub
-  const hubGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.2, 16);
-  const hubMaterial = new THREE.MeshStandardMaterial({ color: 0x222222 });
-  const hub = new THREE.Mesh(hubGeometry, hubMaterial);
-  hub.rotation.x = Math.PI / 2; // Rotate to match Z-axis alignment
-  propeller.add(hub);
-
-  // Blades
-  const bladeGeometry = new THREE.BoxGeometry(2, 0.1, 0.02);
-  const bladeMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
-
-  const blade = new THREE.Mesh(bladeGeometry, bladeMaterial);
-  blade.rotation.x = Math.PI / 2;
-  propeller.add(blade);
-
-  propeller.position.set(0, 0, 2); // Move to nose
-
-  return propeller;
-}
-
+//function createPropeller() {
+//  const propeller = new THREE.Group();
+//
+//  // Hub
+//  const hubGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.2, 16);
+//  const hubMaterial = new THREE.MeshStandardMaterial({ color: 0x222222 });
+//  const hub = new THREE.Mesh(hubGeometry, hubMaterial);
+//  hub.rotation.x = Math.PI / 2; // Rotate to match Z-axis alignment
+//  propeller.add(hub);
+//
+//  // Blades
+//  const bladeGeometry = new THREE.BoxGeometry(2, 0.1, 0.02);
+//  const bladeMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
+//
+//  const blade = new THREE.Mesh(bladeGeometry, bladeMaterial);
+//  blade.rotation.x = Math.PI / 2;
+//  propeller.add(blade);
+//
+//  propeller.position.set(0, 0, 2); // Move to nose
+//
+//  return propeller;
+//}
+//
 // Main Aircraft Assembly
 const aircraft = new THREE.Group() as Aircraft;
 
@@ -79,10 +79,6 @@ aircraft.add(createFuselage());
 aircraft.add(createCockpit());
 aircraft.add(createWing());
 aircraft.add(createTail());
-const propeller = createPropeller();
-aircraft.add(propeller);
-
-aircraft.propeller = propeller;
 
 export default aircraft;
 

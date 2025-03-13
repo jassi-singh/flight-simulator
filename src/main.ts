@@ -1,6 +1,6 @@
 import aircraft from './aircraft';
-import { handleAircraftControls, updateHud } from './controls';
-import { ground, sky } from './ground-sky';
+import { handleAircraftControls, updateBullets, updateHud } from './controls';
+import { buildings, ground, runway, sky, trees } from './ground-sky';
 import './style.css';
 import * as THREE from 'three';
 
@@ -19,12 +19,15 @@ directionalLight.position.set(100, 100, 100); // Position the light
 scene.add(directionalLight);
 
 scene.add(ground);
+scene.add(runway);
 scene.background = sky;
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.lookAt(aircraft.position)
 
 scene.add(aircraft)
+trees.forEach(tree => scene.add(tree));
+buildings.forEach(building => scene.add(building));
 
 function updateCamera() {
   const offset = new THREE.Vector3(0, 2, -5); // Position behind and above
@@ -49,11 +52,10 @@ function updateTrailingCamera() {
 }
 
 function animate() {
-  aircraft.propeller.rotation.z += 0.3;
-
   updateCamera();
   updateTrailingCamera();
-  handleAircraftControls(aircraft);
+  handleAircraftControls(aircraft, scene);
+  updateBullets(scene);
   updateHud();
 
 
