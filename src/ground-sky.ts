@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-const groundSize = 1000; // Terrain dimensions
+const groundSize = 10000; // Terrain dimensions
 const textureLoader = new THREE.TextureLoader();
 
 // Load grass texture with proper wrapping

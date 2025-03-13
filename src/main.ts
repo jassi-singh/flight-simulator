@@ -33,13 +33,40 @@ function updateCamera() {
   camera.lookAt(aircraft.position);
 }
 
+const trailCamera = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+
+function updateTrailingCamera() {
+  const offset = new THREE.Vector3(0, 1, 2); // Offset behind and slightly above
+  offset.applyQuaternion(aircraft.quaternion); // Rotate offset based on aircraft orientation
+
+  trailCamera.position.copy(aircraft.position).add(offset); // Position the camera
+  trailCamera.lookAt(aircraft.position); // Keep camera focused on aircraft}
+}
+
 function animate() {
   aircraft.propeller.rotation.z += 0.3;
 
   updateCamera();
+  updateTrailingCamera();
   handleAircraftControls(aircraft);
   updateHud();
 
+
+  renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+  renderer.setScissorTest(false);
   renderer.render(scene, camera);
+
+  const miniWidth = window.innerWidth * 0.25;
+  const miniHeight = window.innerHeight * 0.25;
+  renderer.setViewport(window.innerWidth - miniWidth - 10, window.innerHeight - miniHeight - 10, miniWidth, miniHeight);
+  renderer.setScissor(window.innerWidth - miniWidth - 10, window.innerHeight - miniHeight - 10, miniWidth, miniHeight);
+  renderer.setScissorTest(true);
+  renderer.render(scene, trailCamera);
+
 
 }

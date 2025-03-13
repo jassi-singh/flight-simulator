@@ -51,7 +51,7 @@
 - [ ] Add a basic autopilot (optional).
 
 ### Improved Camera Control
-- [ ] Implement a chase camera that follows the aircraft.
+- [x] Implement a chase camera that follows the aircraft.
 - [ ] Allow switching between different camera views (cockpit, chase, etc.).
 
 ### More Detailed Terrain (Heightmap)

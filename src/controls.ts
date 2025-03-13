@@ -11,7 +11,7 @@ window.addEventListener("keyup", (event) => (keyState[event.code] = false));
 /** Manages aircraft state */
 class AircraftState {
   speed = 0;
-  altitude = 0;
+  altitude = 0; // Start above ground
   yaw = 0;
   pitch = 0;
   roll = 0;
@@ -61,8 +61,11 @@ function handleInput() {
   if (keyState["KeyS"]) aircraftState.throttle = Math.max(0, aircraftState.throttle - 0.01);
 
   // Pitch Control (Arrow Up/Down)
-  if (keyState["ArrowUp"]) aircraftState.pitch = Math.min(Math.PI / 2, aircraftState.pitch + aircraftState.rotationSpeed); // Nose up
-  if (keyState["ArrowDown"]) aircraftState.pitch = Math.max(-Math.PI / 2, aircraftState.pitch - aircraftState.rotationSpeed); // Nose down
+  if (keyState["ArrowUp"]) {
+    const minPitch = aircraftState.isOnGround ? 0 : Math.PI / 2; aircraftState.pitch = Math.min(minPitch, aircraftState.pitch + aircraftState.rotationSpeed);
+  }
+
+  if (keyState["ArrowDown"]) aircraftState.pitch = Math.max(-Math.PI / 2, aircraftState.pitch - aircraftState.rotationSpeed);
 
   // Roll Control (Arrow Left/Right)
   if (!aircraftState.isOnGround) {
@@ -122,7 +125,6 @@ export function updateHud() {
   document.getElementById("pitch")!.innerText = aircraftState.pitch.toFixed(2);
   document.getElementById("roll")!.innerText = aircraftState.roll.toFixed(2);
   document.getElementById("yaw")!.innerText = aircraftState.yaw.toFixed(2);
-  document.getElementById("onGround")!.innerText = aircraftState.isOnGround ? "Yes" : "No";
 }
 
 
