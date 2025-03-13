@@ -1,74 +1,83 @@
-import aircraft from './aircraft';
-import { handleAircraftControls, updateBullets, updateHud } from './controls';
-import { buildings, ground, runway, sky, trees } from './ground-sky';
+import { setupRenderer } from './utils/renderer';
+import { createMainCamera, createTrailingCamera, updateCameras } from './utils/camera';
+import { createEnvironment } from './components/environment';
+import { createAircraft } from './components/aircraft';
+import { handleAircraftControls } from './systems/controls';
+import { updateBullets } from './systems/weapons';
+import { updateHud } from './components/hud';
 import './style.css';
 import * as THREE from 'three';
 
+// Create scene and setup rendering
 const scene = new THREE.Scene();
+const { renderer, viewport } = setupRenderer();
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setAnimationLoop(animate);
-document.body.appendChild(renderer.domElement);
-
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft light
+// Setup lighting
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight.position.set(100, 100, 100); // Position the light
+directionalLight.position.set(100, 100, 100);
 scene.add(directionalLight);
 
+// Create environment
+const { ground, runway, sky, trees, buildings } = createEnvironment();
 scene.add(ground);
 scene.add(runway);
 scene.background = sky;
-
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.lookAt(aircraft.position)
-
-scene.add(aircraft)
 trees.forEach(tree => scene.add(tree));
 buildings.forEach(building => scene.add(building));
 
-function updateCamera() {
-  const offset = new THREE.Vector3(0, 2, -5); // Position behind and above
-  offset.applyQuaternion(aircraft.quaternion); // Rotate with aircraft
-  camera.position.copy(aircraft.position).add(offset);
-  camera.lookAt(aircraft.position);
-}
+// Create aircraft
+const aircraft = createAircraft();
+scene.add(aircraft);
 
-const trailCamera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
+// Setup cameras
+const mainCamera = createMainCamera(viewport.width / viewport.height);
+const trailCamera = createTrailingCamera(viewport.width / viewport.height);
 
-function updateTrailingCamera() {
-  const offset = new THREE.Vector3(0, 1, 2); // Offset behind and slightly above
-  offset.applyQuaternion(aircraft.quaternion); // Rotate offset based on aircraft orientation
-
-  trailCamera.position.copy(aircraft.position).add(offset); // Position the camera
-  trailCamera.lookAt(aircraft.position); // Keep camera focused on aircraft}
-}
-
+// Animation loop
 function animate() {
-  updateCamera();
-  updateTrailingCamera();
-  handleAircraftControls(aircraft, scene);
-  updateBullets(scene);
-  updateHud();
+	// Update game systems
+	handleAircraftControls(aircraft, scene);
+	updateBullets(scene);
+	updateHud();
+	updateCameras(mainCamera, trailCamera, aircraft);
 
+	// Render main view
+	renderer.setViewport(0, 0, viewport.width, viewport.height);
+	renderer.setScissorTest(false);
+	renderer.render(scene, mainCamera);
 
-  renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-  renderer.setScissorTest(false);
-  renderer.render(scene, camera);
-
-  const miniWidth = window.innerWidth * 0.25;
-  const miniHeight = window.innerHeight * 0.25;
-  renderer.setViewport(window.innerWidth - miniWidth - 10, window.innerHeight - miniHeight - 10, miniWidth, miniHeight);
-  renderer.setScissor(window.innerWidth - miniWidth - 10, window.innerHeight - miniHeight - 10, miniWidth, miniHeight);
-  renderer.setScissorTest(true);
-  renderer.render(scene, trailCamera);
-
-
+	// Render picture-in-picture view
+	const miniWidth = viewport.width * 0.25;
+	const miniHeight = viewport.height * 0.25;
+	renderer.setViewport(
+		viewport.width - miniWidth - 10,
+		viewport.height - miniHeight - 10,
+		miniWidth,
+		miniHeight
+	);
+	renderer.setScissor(
+		viewport.width - miniWidth - 10,
+		viewport.height - miniHeight - 10,
+		miniWidth,
+		miniHeight
+	);
+	renderer.setScissorTest(true);
+	renderer.render(scene, trailCamera);
 }
+
+// Start animation loop
+renderer.setAnimationLoop(animate);
+
+// Handle window resize
+window.addEventListener('resize', () => {
+	viewport.width = window.innerWidth;
+	viewport.height = window.innerHeight;
+	renderer.setSize(viewport.width, viewport.height);
+	mainCamera.aspect = viewport.width / viewport.height;
+	mainCamera.updateProjectionMatrix();
+	trailCamera.aspect = viewport.width / viewport.height;
+	trailCamera.updateProjectionMatrix();
+});
