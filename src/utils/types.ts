@@ -14,13 +14,19 @@ export interface AircraftState {
   roll: number;
   throttle: number;
   isOnGround: boolean;
+  isStalling: boolean;
+  angleOfAttack: number;
   readonly maxSpeed: number;
   readonly rotationSpeed: number;
   readonly liftForce: number;
   readonly gravity: number;
+  readonly stallAngle: number;
+  readonly dragCoefficient: number;
 
   updateSpeed(): void;
   applyPhysics(): void;
+  getAngleOfAttack(): number;
+  getStallWarning(): boolean;
 }
 
 // Bullet interface

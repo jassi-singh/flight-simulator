@@ -7,23 +7,46 @@ import { shootBullet } from "./weapons";
 const keyState: Record<string, boolean> = {};
 
 // Listen for key presses
-window.addEventListener("keydown", (event) => (keyState[event.code] = true));
+window.addEventListener("keydown", (event) => {
+  keyState[event.code] = true;
+});
 window.addEventListener("keyup", (event) => (keyState[event.code] = false));
 
 /** Handle user input */
 function handleInput(aircraft: Aircraft, scene: THREE.Scene) {
   // Throttle control (W/S)
-  if (keyState["KeyW"]) aircraftState.throttle = Math.min(1, aircraftState.throttle + 0.01);
-  if (keyState["KeyS"]) aircraftState.throttle = Math.max(0, aircraftState.throttle - 0.01);
+  if (keyState["KeyW"]) {
+    aircraftState.throttle = Math.min(1, aircraftState.throttle + 0.01);
+  }
+  if (keyState["KeyS"]) {
+    aircraftState.throttle = Math.max(0, aircraftState.throttle - 0.01);
+  }
 
-  // Pitch Control (Arrow Up/Down)
+  // INVERTED PITCH CONTROL AS REQUESTED:
+  // Down Arrow = Nose Up (negative pitch)
+  // Up Arrow = Nose Down (positive pitch)
+
   if (keyState["ArrowUp"]) {
-    const minPitch = aircraftState.isOnGround ? 0 : Math.PI / 2;
-    aircraftState.pitch = Math.min(minPitch, aircraftState.pitch + aircraftState.rotationSpeed);
+    // Nose DOWN (positive pitch in aircraft coordinates)
+    aircraftState.pitch = Math.min(Math.PI / 3, aircraftState.pitch + aircraftState.rotationSpeed);
   }
 
   if (keyState["ArrowDown"]) {
-    aircraftState.pitch = Math.max(-Math.PI / 2, aircraftState.pitch - aircraftState.rotationSpeed);
+    // Nose UP (negative pitch in aircraft coordinates)
+    // If we have sufficient speed and are on the ground, allow takeoff
+    if (aircraftState.isOnGround && aircraftState.speed > 30) {
+      // Allow more pitch during takeoff
+      const takeoffPitchRate = aircraftState.rotationSpeed * 1.0;
+      aircraftState.pitch = Math.max(-Math.PI / 8, aircraftState.pitch - takeoffPitchRate);
+    } else if (!aircraftState.isOnGround) {
+      // Normal flight pitch control (upward)
+      aircraftState.pitch = Math.max(-Math.PI / 3, aircraftState.pitch - aircraftState.rotationSpeed);
+    }
+  }
+
+  // If no pitch input, gradually return to level flight
+  if (!keyState["ArrowUp"] && !keyState["ArrowDown"]) {
+    aircraftState.pitch *= 0.98; // Slowly return to zero
   }
 
   // Roll Control (Arrow Left/Right)
@@ -46,8 +69,8 @@ function handleInput(aircraft: Aircraft, scene: THREE.Scene) {
   // Shoot bullets (Space)
   if (keyState["Space"]) {
     shootBullet(aircraft, scene);
-    // Add recoil to the aircraft by nosing down
-    aircraftState.pitch += aircraftState.rotationSpeed * 0.2;
+    // Add recoil to the aircraft
+    aircraftState.pitch += aircraftState.rotationSpeed * 0.2; // Changed to match inverted controls
   }
 
   // Yaw Control (A/D) - Turn left/right
@@ -72,9 +95,12 @@ export function handleAircraftControls(aircraft: Aircraft, scene: THREE.Scene) {
   aircraft.getWorldDirection(direction);
   direction.normalize();
 
-  // Move in the direction the aircraft is facing
-  aircraft.position.addScaledVector(direction, aircraftState.speed);
+  // Scale movement - divide speed by 100 for visual movement rate
+  const movementSpeed = aircraftState.speed / 100;
 
-  // Update aircraft altitude
-  aircraft.position.y = aircraftState.altitude;
+  // Move in the direction the aircraft is facing
+  aircraft.position.addScaledVector(direction, movementSpeed);
+
+  // Update aircraft altitude - scale for visual appearance
+  aircraft.position.y = aircraftState.altitude / 20;
 }
