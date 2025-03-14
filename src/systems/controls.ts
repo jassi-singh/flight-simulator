@@ -1,10 +1,12 @@
 import * as THREE from "three";
 import { Aircraft } from "../utils/types";
 import { aircraftState } from "./physics";
-import { shootBullet } from "./weapons";
+import { fireBullet } from './weapons';
 
 // Tracks the state of key presses
 const keyState: Record<string, boolean> = {};
+const fireRate = 200; // Fire rate in milliseconds
+let lastFireTime = 0;
 
 // Listen for key presses
 window.addEventListener("keydown", (event) => {
@@ -68,7 +70,20 @@ function handleInput(aircraft: Aircraft, scene: THREE.Scene) {
 
   // Shoot bullets (Space)
   if (keyState["Space"]) {
-    shootBullet(aircraft, scene);
+    const currentTime = Date.now();
+    if (currentTime - lastFireTime > fireRate) {
+      lastFireTime = currentTime;
+
+      // Get aircraft position and direction
+      const direction = new THREE.Vector3();
+      aircraft.getWorldDirection(direction);
+
+      const bulletPosition = aircraft.position.clone();
+      const bulletDirection = direction.clone();
+
+      // Fire bullet from aircraft position in aircraft direction
+      fireBullet(scene, bulletPosition, bulletDirection);
+    }
     // Add recoil to the aircraft
     aircraftState.pitch += aircraftState.rotationSpeed * 0.2; // Changed to match inverted controls
   }

@@ -1,35 +1,74 @@
-import * as THREE from "three";
-import { Aircraft, Bullet } from "../utils/types";
+import * as THREE from 'three';
+import { BalloonManager } from '../components/balloons';
 
-const bullets: Bullet[] = []; // Store active bullets
-const bulletSpeed = 5;
-const bulletLifetime = 100; // Frames before bullet disappears
+// Track bullets
+const bullets: Array<{
+  mesh: THREE.Mesh;
+  velocity: THREE.Vector3;
+  lifetime: number;
+}> = [];
 
-/** Shoot bullets */
-export function shootBullet(aircraft: Aircraft, scene: THREE.Scene) {
-  const bulletGeometry = new THREE.SphereGeometry(0.3, 8, 8); // Small sphere bullet
+const bulletSpeed = 10;
+const bulletLifetime = 100; // Frames a bullet lives for
+const bulletRadius = 0.3
+
+// Store balloon manager reference
+let balloonManager: BalloonManager | null = null;
+
+// Set balloon manager
+export function setBalloonManager(manager: BalloonManager) {
+  balloonManager = manager;
+}
+
+// Fire a bullet
+export function fireBullet(scene: THREE.Scene, position: THREE.Vector3, direction: THREE.Vector3) {
+  const bulletGeometry = new THREE.SphereGeometry(bulletRadius, 8, 8);
   const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
   const bullet = new THREE.Mesh(bulletGeometry, bulletMaterial);
 
-  bullet.position.copy(aircraft.position); // Start at aircraft position
-
-  // Set initial velocity
-  const direction = new THREE.Vector3();
-  aircraft.getWorldDirection(direction);
-  bullet.userData.velocity = direction.multiplyScalar(bulletSpeed);
-
-  bullets.push({ mesh: bullet, lifespan: bulletLifetime });
+  // Position bullet slightly in front of aircraft
+  bullet.position.copy(position);
   scene.add(bullet);
+
+  // Calculate bullet velocity based on direction
+  const bulletVelocity = direction.clone().normalize().multiplyScalar(bulletSpeed);
+
+  // Add to bullets array
+  bullets.push({
+    mesh: bullet,
+    velocity: bulletVelocity,
+    lifetime: bulletLifetime
+  });
 }
 
-/** Update bullets movement */
+// Update all bullets
 export function updateBullets(scene: THREE.Scene) {
   for (let i = bullets.length - 1; i >= 0; i--) {
     const bullet = bullets[i];
-    bullet.mesh.position.add(bullet.mesh.userData.velocity);
 
-    bullet.lifespan--; // Reduce lifespan
-    if (bullet.lifespan <= 0) {
+    // Update position
+    bullet.mesh.position.add(bullet.velocity);
+
+    // Check collision with balloons
+    if (balloonManager) {
+      const hit = balloonManager.checkCollisions(
+        bullet.mesh.position.clone(),
+        bulletRadius
+      );
+
+      if (hit) {
+        // Remove bullet on hit
+        scene.remove(bullet.mesh);
+        bullets.splice(i, 1);
+        continue;
+      }
+    }
+
+    // Decrease lifetime
+    bullet.lifetime--;
+
+    // Remove if expired
+    if (bullet.lifetime <= 0) {
       scene.remove(bullet.mesh);
       bullets.splice(i, 1);
     }
