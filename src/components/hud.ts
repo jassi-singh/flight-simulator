@@ -1,99 +1,136 @@
-import { getCurrentAircraftState } from '../systems/physics';
+import { aircraftState } from "../systems/physics";
 
-// DOM element IDs for HUD components
-const HUD_ELEMENTS = {
-  SPEED: 'speed-value',
-  ALTITUDE: 'altitude-value',
-  THROTTLE: 'throttle-value',
-  PITCH: 'pitch-value',
-  ROLL: 'roll-value',
-  YAW: 'yaw-value',
-  AOA: 'aoa-value',
-  STALL: 'stall-warning'
-};
+// HUD elements
+let hudContainer: HTMLDivElement;
+let speedDisplay: HTMLDivElement;
+let altitudeDisplay: HTMLDivElement;
+let throttleDisplay: HTMLDivElement;
+let stallWarningDisplay: HTMLDivElement;
+let instructionsDisplay: HTMLDivElement;
+let infoHintDisplay: HTMLDivElement;
 
-// Initialize HUD elements if they don't exist
-export function initializeHud() {
-  const hudContainer = document.getElementById('hud-container');
+// Constants for gameplay hints (match these with your physics system)
+const MIN_TAKEOFF_SPEED = 50;
+const MIN_TAKEOFF_THROTTLE = 30;
+const MIN_CLIMB_SPEED = 60;
 
+export function createHUD() {
+  // Create main HUD container
   if (!hudContainer) {
-    // Create HUD container
-    const container = document.createElement('div');
-    container.id = 'hud-container';
-    container.style.position = 'absolute';
-    container.style.top = '10px';
-    container.style.left = '10px';
-    container.style.color = 'white';
-    container.style.fontFamily = 'monospace';
-    container.style.fontSize = '14px';
-    container.style.textShadow = '1px 1px 1px black';
-    container.style.padding = '10px';
-    container.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-    container.style.borderRadius = '5px';
-    document.body.appendChild(container);
+    // Main HUD Container
+    hudContainer = document.createElement("div");
+    hudContainer.className = "hud-container";
+    document.body.appendChild(hudContainer);
 
-    // Create HUD elements
-    createHudElement(container, 'SPEED', HUD_ELEMENTS.SPEED);
-    createHudElement(container, 'ALTITUDE', HUD_ELEMENTS.ALTITUDE);
-    createHudElement(container, 'THROTTLE', HUD_ELEMENTS.THROTTLE);
-    createHudElement(container, 'PITCH', HUD_ELEMENTS.PITCH);
-    createHudElement(container, 'ROLL', HUD_ELEMENTS.ROLL);
-    createHudElement(container, 'YAW', HUD_ELEMENTS.YAW);
-    createHudElement(container, 'AOA', HUD_ELEMENTS.AOA);
+    // Create speed display
+    speedDisplay = document.createElement("div");
+    speedDisplay.className = "hud-item";
+    hudContainer.appendChild(speedDisplay);
 
-    // Create stall warning element
-    const stallWarning = document.createElement('div');
-    stallWarning.id = HUD_ELEMENTS.STALL;
-    stallWarning.style.color = 'red';
-    stallWarning.style.fontWeight = 'bold';
-    stallWarning.style.display = 'none';
-    stallWarning.innerText = 'STALL WARNING';
-    container.appendChild(stallWarning);
+    // Create altitude display
+    altitudeDisplay = document.createElement("div");
+    altitudeDisplay.className = "hud-item";
+    hudContainer.appendChild(altitudeDisplay);
+
+    // Create throttle display
+    throttleDisplay = document.createElement("div");
+    throttleDisplay.className = "hud-item";
+    hudContainer.appendChild(throttleDisplay);
+
+    // Create stall warning display
+    stallWarningDisplay = document.createElement("div");
+    stallWarningDisplay.className = "stall-warning hud-item";
+    hudContainer.appendChild(stallWarningDisplay);
+
+    // Create info hint display
+    infoHintDisplay = document.createElement("div");
+    infoHintDisplay.className = "info-hint";
+    infoHintDisplay.textContent = "Press 'I' for flight controls";
+    hudContainer.appendChild(infoHintDisplay);
+
+    // Create instructions display (initially hidden)
+    instructionsDisplay = document.createElement("div");
+    instructionsDisplay.className = "instructions-panel";
+    instructionsDisplay.style.display = "none"; // Hidden by default
+    document.body.appendChild(instructionsDisplay);
+
+    // Add flight instructions content
+    updateInstructions();
+
+    // Add keyboard event listeners
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
   }
 }
 
-function createHudElement(container: HTMLElement, label: string, valueId: string) {
-  const element = document.createElement('div');
-  element.style.marginBottom = '5px';
-
-  const labelSpan = document.createElement('span');
-  labelSpan.innerText = `${label}: `;
-
-  const valueSpan = document.createElement('span');
-  valueSpan.id = valueId;
-  valueSpan.innerText = '0.00';
-
-  element.appendChild(labelSpan);
-  element.appendChild(valueSpan);
-  container.appendChild(element);
-}
-
-export function updateHud() {
-  const state = getCurrentAircraftState();
-
-  updateElement(HUD_ELEMENTS.SPEED, (state.speed * 100).toFixed(0) + " kts");
-  updateElement(HUD_ELEMENTS.ALTITUDE, state.altitude.toFixed(0) + " ft");
-  updateElement(HUD_ELEMENTS.THROTTLE, (state.throttle * 100).toFixed(0) + "%");
-  updateElement(HUD_ELEMENTS.PITCH, (state.pitch * (180 / Math.PI)).toFixed(1) + "°");
-  updateElement(HUD_ELEMENTS.ROLL, (state.roll * (180 / Math.PI)).toFixed(1) + "°");
-  updateElement(HUD_ELEMENTS.YAW, (state.yaw * (180 / Math.PI)).toFixed(1) + "°");
-  updateElement(HUD_ELEMENTS.AOA, state.getAngleOfAttack().toFixed(1) + "°");
-
-  // Show/hide stall warning
-  const stallWarning = document.getElementById(HUD_ELEMENTS.STALL);
-  if (stallWarning) {
-    stallWarning.style.display = state.getStallWarning() ? 'block' : 'none';
-
-    // Make it flash when active
-    if (state.getStallWarning()) {
-      stallWarning.style.visibility = Math.floor(Date.now() / 500) % 2 === 0 ? 'visible' : 'hidden';
-    }
+function handleKeyDown(event: KeyboardEvent) {
+  if (event.code === "KeyI") {
+    instructionsDisplay.style.display = "block";
   }
 }
 
-function updateElement(id: string, value: string) {
-  const element = document.getElementById(id);
-  if (element) {
-    element.innerText = value;
+function handleKeyUp(event: KeyboardEvent) {
+  if (event.code === "KeyI") {
+    instructionsDisplay.style.display = "none";
   }
+}
+
+function updateInstructions() {
+  if (instructionsDisplay) {
+    instructionsDisplay.innerHTML = `
+      <h2 class="instructions-title">Flight Controls</h2>
+      <hr class="instructions-divider">
+      <div class="controls-grid">
+        <b>W / S:</b> <span>Increase / Decrease Throttle</span>
+        <b>↓ Down Arrow:</b> <span>Nose Up (Climb)</span>
+        <b>↑ Up Arrow:</b> <span>Nose Down (Descend)</span>
+        <b>← → Arrows:</b> <span>Roll Left / Right</span>
+        <b>Space:</b> <span>Fire Weapon</span>
+      </div>
+      
+      <h3 class="section-title">Flight Requirements:</h3>
+      <ul class="requirements-list">
+        <li>Takeoff requires: ${MIN_TAKEOFF_THROTTLE}% throttle and ${MIN_TAKEOFF_SPEED} km/h speed</li>
+        <li>Climbing requires: at least ${MIN_CLIMB_SPEED} km/h speed</li>
+        <li>Use nose up (↓) only when you have sufficient speed</li>
+      </ul>
+      
+      <p class="close-hint">
+        Release 'I' to close
+      </p>
+    `;
+  }
+}
+
+export function updateHUD() {
+  if (!hudContainer) createHUD();
+
+  // Update speed display
+  speedDisplay.textContent = `Speed: ${Math.round(aircraftState.speed)} km/h`;
+
+  // Update altitude display
+  altitudeDisplay.textContent = `Altitude: ${Math.round(aircraftState.altitude)} m`;
+
+  // Update throttle display
+  throttleDisplay.textContent = `Throttle: ${Math.round(aircraftState.throttle * 100)}%`;
+
+  // Update stall warning
+  if (aircraftState.getStallWarning()) {
+    stallWarningDisplay.textContent = "STALL WARNING";
+    stallWarningDisplay.style.display = "block";
+
+    // Flash the warning
+    const time = Date.now() / 500;
+    const flash = Math.sin(time) > 0;
+    stallWarningDisplay.style.visibility = flash ? "visible" : "hidden";
+  } else {
+    stallWarningDisplay.textContent = "";
+    stallWarningDisplay.style.display = "none";
+  }
+}
+
+// Clean up function to remove event listeners when needed
+export function cleanupHUD() {
+  window.removeEventListener("keydown", handleKeyDown);
+  window.removeEventListener("keyup", handleKeyUp);
 }

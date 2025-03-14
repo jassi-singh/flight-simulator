@@ -1,40 +1,102 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 100vw;
-  min-height: 100vh;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-#hud {
-  position: fixed;
-  bottom: 10px;
+/* Main HUD container */
+.hud-container {
+  position: absolute;
   left: 10px;
+  top: 10px;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-shadow: 1px 1px 1px black;
+  user-select: none;
+  background-color: rgba(0, 0, 0, 0.5);
   padding: 10px;
   border-radius: 5px;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: #fafafa;
-  width: 200px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(3px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
+/* Individual HUD items */
+.hud-item {
+  margin-bottom: 5px;
+}
+
+/* Stall warning style */
+.stall-warning {
+  color: red;
+  font-weight: bold;
+}
+
+/* Info hint (Press I for controls) */
+.info-hint {
+  margin-top: 5px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* Instructions panel */
+.instructions-panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  border-radius: 10px;
+  color: white;
+  font-family: Arial, sans-serif;
+  width: 350px;
+  z-index: 1000;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+/* Instructions title */
+.instructions-title {
+  text-align: center;
+  margin-top: 0;
+}
+
+/* Divider line in instructions */
+.instructions-divider {
+  border-color: #444;
+}
+
+/* Controls grid layout */
+.controls-grid {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 10px;
+}
+
+/* Section title */
+.section-title {
+  margin-top: 20px;
+}
+
+/* Requirements list */
+.requirements-list {
+  padding-left: 20px;
+  margin-top: 5px;
+}
+
+/* Close instructions hint */
+.close-hint {
+  text-align: center;
+  margin-top: 15px;
+  color: #aaa;
+}
+
+/* For flashing animation (can be applied via JS) */
+.flash-hidden {
+  visibility: hidden;
+}
+
+.flash-visible {
+  visibility: visible;
 }

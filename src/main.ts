@@ -4,7 +4,7 @@ import { createEnvironment } from './components/environment';
 import { createAircraft } from './components/aircraft';
 import { handleAircraftControls } from './systems/controls';
 import { updateBullets } from './systems/weapons';
-import { initializeHud, updateHud } from './components/hud';
+import { createHUD, updateHUD } from './components/hud';
 import './style.css';
 import * as THREE from 'three';
 
@@ -37,14 +37,14 @@ const mainCamera = createMainCamera(viewport.width / viewport.height);
 const trailCamera = createTrailingCamera(viewport.width / viewport.height);
 
 // Initialize HUD
-initializeHud();
+createHUD();
 
 // Animation loop
 function animate() {
 	// Update game systems
 	handleAircraftControls(aircraft, scene);
 	updateBullets(scene);
-	updateHud();
+	updateHUD();
 	updateCameras(mainCamera, trailCamera, aircraft);
 
 	// Render main view
