@@ -6,11 +6,13 @@ const bullets: Array<{
   mesh: THREE.Mesh;
   velocity: THREE.Vector3;
   lifetime: number;
+  id?: string;  // Optional ID for multiplayer bullets
+  playerId?: string;  // Optional player ID for multiplayer bullets
 }> = [];
 
 const bulletSpeed = 10;
 const bulletLifetime = 100; // Frames a bullet lives for
-const bulletRadius = 0.3
+const bulletRadius = 0.3;
 
 // Store balloon manager reference
 let balloonManager: BalloonManager | null = null;
@@ -21,7 +23,13 @@ export function setBalloonManager(manager: BalloonManager) {
 }
 
 // Fire a bullet
-export function fireBullet(scene: THREE.Scene, position: THREE.Vector3, direction: THREE.Vector3) {
+export function fireBullet(
+  scene: THREE.Scene,
+  position: THREE.Vector3,
+  direction: THREE.Vector3,
+  id?: string,
+  playerId?: string
+) {
   const bulletGeometry = new THREE.SphereGeometry(bulletRadius, 8, 8);
   const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
   const bullet = new THREE.Mesh(bulletGeometry, bulletMaterial);
@@ -37,8 +45,12 @@ export function fireBullet(scene: THREE.Scene, position: THREE.Vector3, directio
   bullets.push({
     mesh: bullet,
     velocity: bulletVelocity,
-    lifetime: bulletLifetime
+    lifetime: bulletLifetime,
+    id,
+    playerId
   });
+
+  return bullet;
 }
 
 // Update all bullets
@@ -73,4 +85,20 @@ export function updateBullets(scene: THREE.Scene) {
       bullets.splice(i, 1);
     }
   }
+}
+
+// Get bullet by ID (for multiplayer)
+export function getBulletById(id: string) {
+  return bullets.find(bullet => bullet.id === id);
+}
+
+// Remove bullet by ID (for multiplayer)
+export function removeBulletById(scene: THREE.Scene, id: string) {
+  const index = bullets.findIndex(bullet => bullet.id === id);
+  if (index !== -1) {
+    scene.remove(bullets[index].mesh);
+    bullets.splice(index, 1);
+    return true;
+  }
+  return false;
 }

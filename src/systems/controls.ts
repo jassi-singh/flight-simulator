@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { Aircraft } from "../utils/types";
 import { aircraftState } from "./physics";
 import { fireBullet } from './weapons';
+import gameState from "../utils/game-state";
 
 // Tracks the state of key presses
 const keyState: Record<string, boolean> = {};
@@ -83,6 +84,10 @@ function handleInput(aircraft: Aircraft, scene: THREE.Scene) {
 
       // Fire bullet from aircraft position in aircraft direction
       fireBullet(scene, bulletPosition, bulletDirection);
+      const networkManager = gameState.getNetworkManager();
+      if (networkManager && networkManager.getIsConnected()) {
+        networkManager.sendShoot(bulletPosition, bulletDirection);
+      }
     }
     // Add recoil to the aircraft
     aircraftState.pitch += aircraftState.rotationSpeed * 0.2; // Changed to match inverted controls
