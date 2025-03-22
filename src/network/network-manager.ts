@@ -329,7 +329,39 @@ export class NetworkManager extends EventEmitter {
 	 */
 	private createRemoteBullet(data: any): void {
 		if (data.playerId === this.playerId) return; // Skip our own bullets
-		this.updateRemoteBullet(data.id, data);
+
+		if (!this.scene) return;
+
+		// Create position and direction vectors from the data
+		const position = new THREE.Vector3(
+			data.position[0],
+			data.position[1],
+			data.position[2]
+		);
+
+		const direction = new THREE.Vector3(
+			data.direction[0],
+			data.direction[1],
+			data.direction[2]
+		);
+
+		// Make sure direction is normalized
+		direction.normalize();
+
+		// Import weapons system and fire the bullet
+		import('../systems/weapons').then(module => {
+			module.fireBullet(this.scene!, position, direction, data.id, data.playerId);
+		});
+
+		// Store bullet data
+		this.remoteBullets.set(data.id, {
+			id: data.id,
+			playerId: data.playerId,
+			position: position,
+			direction: direction,
+			speed: data.speed || 10, // Default to 10 if not specified
+			createdAt: Date.now()
+		});
 	}
 
 	/**
@@ -368,12 +400,12 @@ export class NetworkManager extends EventEmitter {
 	 */
 	sendShoot(position: THREE.Vector3, direction: THREE.Vector3): void {
 		if (!this.isConnected || !this.socket) return;
-
+		const normalizedDirection = direction.clone().normalize();
 		this.socket.send(JSON.stringify({
 			type: 'shoot',
 			payload: {
 				position: [position.x, position.y, position.z],
-				direction: [direction.x, direction.y, direction.z]
+				direction: [normalizedDirection.x, normalizedDirection.y, normalizedDirection.z]
 			}
 		}));
 	}

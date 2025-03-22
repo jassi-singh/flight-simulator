@@ -30,16 +30,22 @@ export function fireBullet(
   id?: string,
   playerId?: string
 ) {
+  // Ensure direction is normalized
+  const normalizedDirection = direction.clone().normalize();
+
   const bulletGeometry = new THREE.SphereGeometry(bulletRadius, 8, 8);
-  const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  // Use different colors for local vs remote bullets for debugging
+  const bulletMaterial = new THREE.MeshBasicMaterial({
+    color: playerId ? 0x00ff00 : 0xff0000
+  });
   const bullet = new THREE.Mesh(bulletGeometry, bulletMaterial);
 
-  // Position bullet slightly in front of aircraft
-  bullet.position.copy(position);
+  // Position bullet slightly in front of the position (in the direction of travel)
+  bullet.position.copy(position.clone().add(normalizedDirection.clone().multiplyScalar(2)));
   scene.add(bullet);
 
   // Calculate bullet velocity based on direction
-  const bulletVelocity = direction.clone().normalize().multiplyScalar(bulletSpeed);
+  const bulletVelocity = normalizedDirection.multiplyScalar(bulletSpeed);
 
   // Add to bullets array
   bullets.push({
