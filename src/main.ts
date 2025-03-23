@@ -3,7 +3,7 @@ import { createMainCamera, createTrailingCamera, updateCameras } from './utils/c
 import { createEnvironment } from './components/environment';
 import { createAircraft } from './components/aircraft';
 import { handleAircraftControls } from './systems/controls';
-import { updateBullets, setBalloonManager, fireBullet } from './systems/weapons';
+import { updateBullets, setBalloonManager } from './systems/weapons';
 import { createHUD, updateHUD } from './components/hud';
 import { createBalloons } from './components/balloons';
 import { createScoreCard } from './components/scorecard';
@@ -57,7 +57,7 @@ const trailCamera = createTrailingCamera(viewport.width / viewport.height);
 createHUD();
 
 // Initialize NetworkManager for multiplayer
-const networkManager = new NetworkManager('ws://localhost:8080/ws');
+const networkManager = new NetworkManager();
 GameState.setNetworkManager(networkManager);
 networkManager.init(scene);
 networkManager.connect();
@@ -174,34 +174,6 @@ function setupNetworkEvents(networkManager: NetworkManager) {
 		showNotification(`Player ${playerId} left the game`);
 	});
 
-	// Hook into shooting events for multiplayer
-	document.addEventListener('keydown', (event) => {
-		if (event.code === 'Space') { // Assuming Space is your fire key
-			handlePlayerShoot();
-		}
-	});
-
-	// Handle mouse click for shooting
-	document.addEventListener('click', () => {
-		handlePlayerShoot();
-	});
-}
-
-/**
- * Handle player shooting and send to multiplayer
- */
-function handlePlayerShoot() {
-	if (!networkManager.getIsConnected()) return;
-
-	// Get aircraft position and direction
-	const position = aircraft.position.clone();
-	const direction = new THREE.Vector3(0, 0, -1).applyQuaternion(aircraft.quaternion);
-
-	// Fire local bullet
-	fireBullet(scene, position, direction);
-
-	// Send shoot action to server
-	networkManager.sendShoot(position, direction);
 }
 
 /**

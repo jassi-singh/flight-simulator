@@ -3,6 +3,7 @@ import { EventEmitter } from '../utils/event-emitter';
 import { Aircraft } from '../utils/types';
 import { createAircraft } from '../components/aircraft';
 
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 // Remote player representation
 export interface RemotePlayer {
 	id: string;
@@ -34,9 +35,9 @@ export class NetworkManager extends EventEmitter {
 
 	private scene: THREE.Scene | null = null;
 
-	constructor(serverUrl: string = 'ws://localhost:8080/ws') {
+	constructor() {
 		super();
-		this.serverUrl = serverUrl;
+		this.serverUrl = SERVER_URL || 'ws://localhost:3000';
 	}
 
 	/**
@@ -81,7 +82,7 @@ export class NetworkManager extends EventEmitter {
 	/**
 	 * Handle WebSocket open event
 	 */
-	private handleOpen(event: Event): void {
+	private handleOpen(): void {
 		console.log('[NetworkManager] Connected to server');
 		this.isConnected = true;
 		this.emit('connected');
@@ -134,7 +135,6 @@ export class NetworkManager extends EventEmitter {
 	private handleClose(event: CloseEvent): void {
 		console.log(`[NetworkManager] Disconnected from server: ${event.code}`);
 		this.isConnected = false;
-		this.updateConnectionStatus('Disconnected from server. Reconnecting...', false);
 		this.emit('disconnected', event.code);
 
 		// Cleanup remote players and bullets
@@ -168,7 +168,7 @@ export class NetworkManager extends EventEmitter {
 			});
 
 			// Remove players that no longer exist in the state
-			this.remotePlayers.forEach((player, id) => {
+			this.remotePlayers.forEach((_, id) => {
 				if (!state.players[id]) {
 					this.removeRemotePlayer(id);
 				}
@@ -182,7 +182,7 @@ export class NetworkManager extends EventEmitter {
 			});
 
 			// Remove bullets that no longer exist in the state
-			this.remoteBullets.forEach((bullet, id) => {
+			this.remoteBullets.forEach((_, id) => {
 				if (!state.bullets[id]) {
 					this.removeRemoteBullet(id);
 				}
