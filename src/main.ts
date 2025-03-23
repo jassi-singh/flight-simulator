@@ -11,6 +11,10 @@ import { NetworkManager } from './network/network-manager';
 import './style.css';
 import * as THREE from 'three';
 import GameState from './utils/game-state';
+import { setupOrientationHandling } from './utils/device-orientation';
+
+// Call this at the start of your app
+setupOrientationHandling();
 
 // Create scene and setup rendering
 const scene = new THREE.Scene();

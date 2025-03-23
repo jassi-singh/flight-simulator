@@ -100,3 +100,61 @@ body {
 .flash-visible {
   visibility: visible;
 }
+
+/* Mobile Controls Styling */
+#mobile-controls {
+  display: none;
+  /* Hidden by default, will be shown on mobile devices */
+}
+
+/* Only show mobile controls on touch devices */
+@media (pointer: coarse) {
+  #mobile-controls {
+    display: flex;
+  }
+}
+
+/* Prevent pull-to-refresh and other browser gestures while playing */
+html,
+body {
+  overscroll-behavior: none;
+  touch-action: none;
+  position: fixed;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Make canvas responsive */
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Additional orientation styles */
+@media screen and (orientation: portrait) {
+  #mobile-controls {
+    flex-direction: row;
+  }
+}
+
+@media screen and (orientation: landscape) {
+  #mobile-controls {
+    bottom: 20px;
+  }
+}
+
+/* Ensure the UI is above the canvas */
+#mobile-controls {
+  z-index: 100;
+}
+
+/* Disable highlighting on mobile */
+button {
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}

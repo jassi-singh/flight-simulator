@@ -4,7 +4,7 @@ export function createScoreCard() {
   scoreElement.id = 'score-card';
   scoreElement.style.position = 'absolute';
   scoreElement.style.bottom = '20px';
-  scoreElement.style.left = '20px';
+  scoreElement.style.right = '20px';
   scoreElement.style.padding = '10px 20px';
   scoreElement.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
   scoreElement.style.color = 'white';
